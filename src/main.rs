@@ -1,3 +1,4 @@
+use std::io;
 
 struct Player {
     health: i64,
@@ -5,15 +6,23 @@ struct Player {
     oxygen: i64,
 }
 
+enum Action {
+    Eat,
+    Wait,
+    Quit,
+}
+
 fn main() {
     let mut player = Player {
-        health: 100,
-        nutrition: 100,
-        oxygen: 100,
+        health: 10,
+        nutrition: 10,
+        oxygen: 10,
     };
 
     while player_is_alive(&player) {
         player_status(&player);
+        let action = prompt_for_action();
+        player_action(&mut player, action);
         player_tick(&mut player);
     }
     player_death();
@@ -29,14 +38,44 @@ fn player_tick(player: &mut Player) {
     player.nutrition -= 1;
 }
 
+fn prompt_for_action() -> Action {
+    loop {
+        println!("What do you do?
+            E)at
+            W)ait
+            Q)uit the game
+        ");
+        let mut user_input = String::new();
+        io::stdin().read_line(&mut user_input)
+            .expect("Failed to read line");
+
+        match user_input.chars().next() {
+            Some('e') => return Action::Eat,
+            Some('w') => return Action::Wait,
+            Some('q') => return Action::Quit,
+            _ => (),
+        };
+    }
+}
+
+fn player_action(player: &mut Player, action: Action) {
+    match action {
+        Action::Eat => player.nutrition += 10,
+        Action::Wait => (),
+        Action::Quit => panic!("Quitting game"),
+    }
+}
+
 fn player_is_alive(player: &Player) -> bool {
     player.health > 0
 }
 
 fn player_status(player: &Player) {
+    println!();
     println!("Health: {}", player.health);
     println!("Nutrition: {}", player.nutrition);
     println!("Oxygen: {}", player.oxygen);
+    println!();
 }
 
 fn player_death() {
