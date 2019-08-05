@@ -6,16 +6,20 @@ struct Player {
 }
 
 fn main() {
-    let mut player = Player{100, 100, 100};
+    let mut player = Player {
+        health: 100,
+        nutrition: 100,
+        oxygen: 100,
+    };
 
-    while playerIsAlive(player) {
-        playerStatus(player)
-        playerTick(player);
+    while player_is_alive(&player) {
+        player_status(&player);
+        player_tick(&mut player);
     }
-    playerDeath(player);
+    player_death();
 }
 
-fn playerTick(player: &Player) {
+fn player_tick(player: &mut Player) {
     if player.nutrition < 0 {
         player.health -= 1;
     }
@@ -25,16 +29,16 @@ fn playerTick(player: &Player) {
     player.nutrition -= 1;
 }
 
-fn playerIsAlive(player: &Player) -> bool {
-    return player.health > 0;
+fn player_is_alive(player: &Player) -> bool {
+    player.health > 0
 }
 
-fn playerStatus(player: &Player) {
+fn player_status(player: &Player) {
     println!("Health: {}", player.health);
     println!("Nutrition: {}", player.nutrition);
     println!("Oxygen: {}", player.oxygen);
 }
 
-fn playerDeath(player: &Player) {
+fn player_death() {
     println!("Player is dead");
 }
