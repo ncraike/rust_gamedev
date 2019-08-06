@@ -41,10 +41,10 @@ fn player_tick(player: &mut Player) {
 fn prompt_for_action() -> Action {
     loop {
         println!("What do you do?
-            E)at
-            W)ait
-            Q)uit the game
-        ");
+E)at
+W)ait
+Q)uit the game
+");
         let mut user_input = String::new();
         io::stdin().read_line(&mut user_input)
             .expect("Failed to read line");
@@ -71,11 +71,11 @@ fn player_is_alive(player: &Player) -> bool {
 }
 
 fn player_status(player: &Player) {
-    println!();
-    println!("Health: {}", player.health);
-    println!("Nutrition: {}", player.nutrition);
-    println!("Oxygen: {}", player.oxygen);
-    println!();
+    println!("
+Health: {}
+Nutrition: {}
+Oxygen: {}
+", player.health, player.nutrition, player.oxygen);
 }
 
 fn player_death() {
