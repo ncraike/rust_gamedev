@@ -23,19 +23,21 @@ fn main() {
         player_status(&player);
         let action = prompt_for_action();
         player_action(&mut player, action);
-        player_tick(&mut player);
+        player.tick();
     }
     player_death();
 }
 
-fn player_tick(player: &mut Player) {
-    if player.nutrition < 0 {
-        player.health -= 1;
+impl Player {
+    fn tick(&mut self) {
+        if self.nutrition < 0 {
+            self.health -= 1;
+        }
+        if self.oxygen < 0 {
+            self.health -= 10;
+        }
+        self.nutrition -= 1;
     }
-    if player.oxygen < 0 {
-        player.health -= 10;
-    }
-    player.nutrition -= 1;
 }
 
 fn prompt_for_action() -> Action {
