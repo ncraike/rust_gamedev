@@ -19,16 +19,38 @@ fn main() {
         oxygen: 10,
     };
 
-    while player_is_alive(&player) {
-        player_status(&player);
+    while player.is_alive() {
+        player.print_status();
         let action = prompt_for_action();
-        player_action(&mut player, action);
+        player.do_action(action);
         player.tick();
     }
-    player_death();
+    println!("Player is dead");
 }
 
 impl Player {
+
+    fn is_alive(&self) -> bool {
+        self.health > 0
+    }
+
+
+    fn print_status(&self) {
+        println!("
+Health: {}
+Nutrition: {}
+Oxygen: {}
+", self.health, self.nutrition, self.oxygen);
+    }
+
+    fn do_action(&mut self, action: Action) {
+        match action {
+            Action::Eat => self.nutrition += 10,
+            Action::Wait => (),
+            Action::Quit => panic!("Quitting game"),
+        }
+    }
+
     fn tick(&mut self) {
         if self.nutrition < 0 {
             self.health -= 1;
@@ -58,28 +80,4 @@ Q)uit the game
             _ => (),
         };
     }
-}
-
-fn player_action(player: &mut Player, action: Action) {
-    match action {
-        Action::Eat => player.nutrition += 10,
-        Action::Wait => (),
-        Action::Quit => panic!("Quitting game"),
-    }
-}
-
-fn player_is_alive(player: &Player) -> bool {
-    player.health > 0
-}
-
-fn player_status(player: &Player) {
-    println!("
-Health: {}
-Nutrition: {}
-Oxygen: {}
-", player.health, player.nutrition, player.oxygen);
-}
-
-fn player_death() {
-    println!("Player is dead");
 }
