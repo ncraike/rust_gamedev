@@ -1,19 +1,35 @@
 use std::io;
 
-struct Player {
+enum GameResult {
+    PlayerDeath,
+    UserQuits,
+}
+
+struct Character {
     health: i64,
     nutrition: i64,
     oxygen: i64,
 }
 
-enum Action {
+enum UserAction {
+    PlayerDo(CharacterAction),
+    QuitGame,
+}
+
+enum CharacterAction {
     Eat,
     Wait,
-    Quit,
 }
 
 fn main() {
-    let mut player = Player {
+    match game_loop() {
+        GameResult::PlayerDeath => println!("You have died!"),
+        GameResult::UserQuits => println!("Quitting game..."),
+    }
+}
+
+fn game_loop() -> GameResult {
+    let mut player = Character {
         health: 10,
         nutrition: 10,
         oxygen: 10,
@@ -22,18 +38,20 @@ fn main() {
     while player.is_alive() {
         player.print_status();
         let action = prompt_for_action();
-        player.do_action(action);
+        match action {
+            UserAction::PlayerDo(player_action) => player.do_action(player_action),
+            UserAction::QuitGame => return GameResult::UserQuits,
+        }
         player.tick();
     }
-    println!("Player is dead");
+    return GameResult::PlayerDeath;
 }
 
-impl Player {
+impl Character {
 
     fn is_alive(&self) -> bool {
         self.health > 0
     }
-
 
     fn print_status(&self) {
         println!("
@@ -43,11 +61,10 @@ Oxygen: {}
 ", self.health, self.nutrition, self.oxygen);
     }
 
-    fn do_action(&mut self, action: Action) {
+    fn do_action(&mut self, action: CharacterAction) {
         match action {
-            Action::Eat => self.nutrition += 10,
-            Action::Wait => (),
-            Action::Quit => panic!("Quitting game"),
+            CharacterAction::Eat => self.nutrition += 10,
+            CharacterAction::Wait => (),
         }
     }
 
@@ -62,7 +79,7 @@ Oxygen: {}
     }
 }
 
-fn prompt_for_action() -> Action {
+fn prompt_for_action() -> UserAction {
     loop {
         println!("What do you do?
 E)at
@@ -74,9 +91,9 @@ Q)uit the game
             .expect("Failed to read line");
 
         match user_input.chars().next() {
-            Some('e') => return Action::Eat,
-            Some('w') => return Action::Wait,
-            Some('q') => return Action::Quit,
+            Some('e') => return UserAction::PlayerDo(CharacterAction::Eat),
+            Some('w') => return UserAction::PlayerDo(CharacterAction::Wait),
+            Some('q') => return UserAction::QuitGame,
             _ => (),
         };
     }
