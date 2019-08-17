@@ -1,6 +1,23 @@
 use std::io;
+use ggez::*;
 
-enum GameResult {
+struct State {
+    dt: std::time::Duration,
+}
+
+impl ggez::event::EventHandler for State {
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.dt = timer::delta(ctx);
+        Ok(())
+    }
+
+    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+        println!("Hello ggez! dt = {}ns", self.dt.subsec_nanos());
+        Ok(())
+    }
+}
+
+enum MyGameResult {
     PlayerDeath,
     UserQuits,
 }
@@ -22,13 +39,16 @@ enum CharacterAction {
 }
 
 fn main() {
-    match game_loop() {
-        GameResult::PlayerDeath => println!("You have died!"),
-        GameResult::UserQuits => println!("Quitting game..."),
-    }
+    let state = &mut State { dt: std::time::Duration::new(0, 0) };
+    let my_conf = conf::Conf::new();
+    let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("hello_ggez", "Nathan")
+        .conf(my_conf)
+        .build()
+        .unwrap();
+    event::run(ctx, event_loop, state).unwrap();
 }
 
-fn game_loop() -> GameResult {
+fn game_loop() -> MyGameResult {
     let mut player = Character {
         health: 10,
         nutrition: 10,
@@ -40,11 +60,11 @@ fn game_loop() -> GameResult {
         let action = prompt_for_action();
         match action {
             UserAction::PlayerDo(player_action) => player.do_action(player_action),
-            UserAction::QuitGame => return GameResult::UserQuits,
+            UserAction::QuitGame => return MyGameResult::UserQuits,
         }
         player.tick();
     }
-    return GameResult::PlayerDeath;
+    return MyGameResult::PlayerDeath;
 }
 
 impl Character {
