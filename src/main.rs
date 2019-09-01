@@ -27,10 +27,11 @@ impl GameState {
         let mut new_game_state = GameState {
             player: Character::new(),
             status_text: StatusText::new(),
-            action_prompt: graphics::Text::new("Press E to eat food, W to wait, Q to quit"),
+            action_prompt: graphics::Text::new(
+                "Press E to eat food\nPress W to wait\nPress Q to quit"),
             pending_action: None,
         };
-        new_game_state.status_text.update_text(&new_game_state.player);
+        new_game_state.status_text.update_status(&new_game_state.player);
         return new_game_state;
     }
 }
@@ -42,7 +43,7 @@ impl event::EventHandler for GameState {
                 self.player.do_action(player_action);
                 self.pending_action = None;
                 self.player.tick();
-                self.status_text.update_text(&self.player);
+                self.status_text.update_status(&self.player);
             }
             Some(UserAction::QuitGame) => {
                 event::quit(ctx);
@@ -59,18 +60,8 @@ impl event::EventHandler for GameState {
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
         graphics::draw(
             ctx,
-            &self.status_text.health,
+            &self.status_text,
             graphics::DrawParam::default().dest(nalgebra::Point2::new(0.0, 0.0)),
-        )?;
-        graphics::draw(
-            ctx,
-            &self.status_text.nutrition,
-            graphics::DrawParam::default().dest(nalgebra::Point2::new(0.0, 20.0)),
-        )?;
-        graphics::draw(
-            ctx,
-            &self.status_text.oxygen,
-            graphics::DrawParam::default().dest(nalgebra::Point2::new(0.0, 40.0)),
         )?;
         graphics::draw(
             ctx,
@@ -155,38 +146,77 @@ enum CharacterAction {
 }
 
 struct StatusText {
-    health: graphics::Text,
-    nutrition: graphics::Text,
-    oxygen: graphics::Text,
+    health_text: graphics::Text,
+    nutrition_text: graphics::Text,
+    oxygen_text: graphics::Text,
 }
 
 impl StatusText {
     fn new() -> StatusText {
+        let mut health_text = graphics::Text::new("Health: ");
+        health_text.add("00");
+        let mut nutrition_text = graphics::Text::new("Nutrition: ");
+        nutrition_text.add("00");
+        let mut oxygen_text = graphics::Text::new("Oxygen: ");
+        oxygen_text.add("00");
         StatusText {
-            health: graphics::Text::new(""),
-            nutrition: graphics::Text::new(""),
-            oxygen: graphics::Text::new(""),
+            health_text,
+            nutrition_text,
+            oxygen_text,
         }
     }
 
-    fn update_health(&mut self, health_value: i64) {
-        self.health = graphics::Text::new("Health: ");
-        self.health.add(health_value.to_string());
+    fn update_status(&mut self, player: &Character) {
+        let health_fragments = self.health_text.fragments_mut();
+        health_fragments[1] = graphics::TextFragment::new(player.health.to_string());
+        let nutrition_fragments = self.nutrition_text.fragments_mut();
+        nutrition_fragments[1] = graphics::TextFragment::new(player.nutrition.to_string());
+        let oxygen_fragments = self.oxygen_text.fragments_mut();
+        oxygen_fragments[1] = graphics::TextFragment::new(player.oxygen.to_string());
+    }
+}
+
+impl graphics::Drawable for StatusText {
+    fn draw(&self, ctx: &mut Context, param: graphics::DrawParam) -> GameResult<()> {
+        self.health_text.draw(ctx, param)?;
+
+        let health_rec: graphics::Rect =
+            graphics::Drawable::dimensions(&self.health_text, ctx).unwrap();
+        let nutrition_dest = nalgebra::Point2::new(param.dest.x, health_rec.bottom() + 5.0);
+        self.nutrition_text.draw(ctx, param.clone().dest(nutrition_dest))?;
+
+        let nutrition_rec: graphics::Rect =
+            graphics::Drawable::dimensions(&self.nutrition_text, ctx).unwrap();
+        let oxygen_dest = nalgebra::Point2::new(
+            param.dest.x,
+            health_rec.bottom() + nutrition_rec.bottom() + 10.0);
+
+        self.oxygen_text.draw(ctx, param.clone().dest(oxygen_dest))?;
+
+        Ok(())
     }
 
-    fn update_nutrition(&mut self, nutrition_value: i64) {
-        self.nutrition = graphics::Text::new("Nutrition: ");
-        self.nutrition.add(nutrition_value.to_string());
+    fn dimensions(&self, ctx: &mut Context) -> Option<graphics::Rect> {
+        let health_rec: graphics::Rect =
+            graphics::Drawable::dimensions(&self.health_text, ctx)?;
+        let nutrition_rec: graphics::Rect =
+            graphics::Drawable::dimensions(&self.nutrition_text, ctx)?;
+        let oxygen_rec: graphics::Rect =
+            graphics::Drawable::dimensions(&self.oxygen_text, ctx)?;
+        Some(
+            health_rec
+                .combine_with(nutrition_rec)
+                .combine_with(oxygen_rec)
+        )
     }
 
-    fn update_oxygen(&mut self, oxygen_value: i64) {
-        self.oxygen = graphics::Text::new("Oxygen: ");
-        self.oxygen.add(oxygen_value.to_string());
+    fn set_blend_mode(&mut self, mode: Option<graphics::BlendMode>) {
+        self.health_text.set_blend_mode(mode);
+        self.nutrition_text.set_blend_mode(mode);
+        self.oxygen_text.set_blend_mode(mode);
     }
 
-    fn update_text(&mut self, player: &Character) {
-        self.update_health(player.health);
-        self.update_nutrition(player.nutrition);
-        self.update_oxygen(player.oxygen);
+    fn blend_mode(&self) -> Option<graphics::BlendMode> {
+        self.health_text.blend_mode()
     }
 }
