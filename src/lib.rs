@@ -13,12 +13,9 @@ pub struct GameState {
 
 impl GameState {
     pub fn new() -> GameState {
-        let mut game_state = GameState {
-            world: entities::GameWorld::new(),
-            ui: ui::UI::new(),
-        };
-        game_state.ui.init(&game_state.world).unwrap();
-        return game_state;
+        let world = entities::GameWorld::new();
+        let ui = ui::UI::new(&world).unwrap();
+        return GameState {world, ui};
     }
 
     pub fn run(&mut self) {

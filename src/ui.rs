@@ -15,19 +15,16 @@ pub struct UI {
 }
 
 impl UI {
-    pub fn new() -> UI {
-        UI {
+    pub fn new(world: &GameWorld) -> GameResult<UI> {
+        let mut ui = UI {
             status_text: StatusText::new(),
             action_prompt: Text::new(
                 "Press E to eat food\nPress W to wait\nPress Q to quit"),
             pending_action: None,
             should_quit: false,
-        }
-    }
-
-    pub fn init(&mut self, world: &GameWorld) -> GameResult<()> {
-        self.status_text.update_status(&world.player);
-        Ok(())
+        };
+        ui.status_text.update_status(&world.player);
+        Ok(ui)
     }
 
     pub fn update(&mut self, _ctx: &mut Context, world: &mut GameWorld) -> GameResult<()> {
