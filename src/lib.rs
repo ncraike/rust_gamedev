@@ -13,10 +13,12 @@ pub struct GameState {
 
 impl GameState {
     pub fn new() -> GameState {
-        GameState {
+        let mut game_state = GameState {
             world: entities::GameWorld::new(),
             ui: ui::UI::new(),
-        }
+        };
+        game_state.ui.init(&game_state.world).unwrap();
+        return game_state;
     }
 
     pub fn run(&mut self) {

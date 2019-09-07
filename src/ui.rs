@@ -25,6 +25,11 @@ impl UI {
         }
     }
 
+    pub fn init(&mut self, world: &GameWorld) -> GameResult<()> {
+        self.status_text.update_status(&world.player);
+        Ok(())
+    }
+
     pub fn update(&mut self, _ctx: &mut Context, world: &mut GameWorld) -> GameResult<()> {
         match self.pending_action {
             Some(UserAction::PlayerDo(player_action)) => {
