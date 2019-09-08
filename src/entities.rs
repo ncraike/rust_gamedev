@@ -1,4 +1,8 @@
 
+use ggez::nalgebra as na;
+
+type Point2 = na::Point2<f32>;
+
 pub struct GameWorld {
     pub player: Character,
 }
@@ -24,6 +28,7 @@ impl GameWorld {
 }
 
 pub struct Character {
+    pub pos: Point2,
     pub health: i64,
     pub nutrition: i64,
     pub oxygen: i64,
@@ -32,6 +37,7 @@ pub struct Character {
 impl Character {
     fn new() -> Character {
         Character {
+            pos: Point2::origin(),
             health: 5,
             nutrition: 5,
             oxygen: 5,
