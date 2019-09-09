@@ -1,6 +1,6 @@
 use ggez::{Context, GameResult};
-use ggez::graphics;
-use ggez::graphics::{BlendMode, Drawable, DrawParam, Rect, Text, TextFragment};
+use ggez::graphics::{
+    clear, draw, present, BlendMode, Drawable, DrawParam, Rect, Text, TextFragment};
 use ggez::input::keyboard;
 use ggez::nalgebra;
 
@@ -44,18 +44,18 @@ impl UI {
     }
 
     pub fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
-        graphics::draw(
+        clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
+        draw(
             ctx,
             &self.status_text,
             DrawParam::default().dest(nalgebra::Point2::new(0.0, 0.0)),
         )?;
-        graphics::draw(
+        draw(
             ctx,
             &self.action_prompt,
             DrawParam::default().dest(nalgebra::Point2::new(0.0, 80.0)),
         )?;
-        graphics::present(ctx)?;
+        present(ctx)?;
         Ok(())
     }
 
