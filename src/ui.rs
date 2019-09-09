@@ -48,12 +48,12 @@ impl UI {
         graphics::draw(
             ctx,
             &self.status_text,
-            graphics::DrawParam::default().dest(nalgebra::Point2::new(0.0, 0.0)),
+            DrawParam::default().dest(nalgebra::Point2::new(0.0, 0.0)),
         )?;
         graphics::draw(
             ctx,
             &self.action_prompt,
-            graphics::DrawParam::default().dest(nalgebra::Point2::new(0.0, 80.0)),
+            DrawParam::default().dest(nalgebra::Point2::new(0.0, 80.0)),
         )?;
         graphics::present(ctx)?;
         Ok(())
