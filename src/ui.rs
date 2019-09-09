@@ -2,7 +2,9 @@ use ggez::{Context, GameResult};
 use ggez::graphics::{
     clear, draw, present, BlendMode, Drawable, DrawParam, Rect, Text, TextFragment};
 use ggez::input::keyboard;
-use ggez::nalgebra;
+use ggez::nalgebra as na;
+
+type Point2 = na::Point2<f32>;
 
 use crate::entities::{Character, CharacterAction, GameWorld};
 
@@ -48,12 +50,12 @@ impl UI {
         draw(
             ctx,
             &self.status_text,
-            DrawParam::default().dest(nalgebra::Point2::new(0.0, 0.0)),
+            DrawParam::default().dest(Point2::new(0.0, 0.0)),
         )?;
         draw(
             ctx,
             &self.action_prompt,
-            DrawParam::default().dest(nalgebra::Point2::new(0.0, 80.0)),
+            DrawParam::default().dest(Point2::new(0.0, 80.0)),
         )?;
         present(ctx)?;
         Ok(())
@@ -121,12 +123,12 @@ impl Drawable for StatusText {
 
         let health_rec: Rect =
             Drawable::dimensions(&self.health_text, ctx).unwrap();
-        let nutrition_dest = nalgebra::Point2::new(param.dest.x, health_rec.bottom() + 5.0);
+        let nutrition_dest = Point2::new(param.dest.x, health_rec.bottom() + 5.0);
         self.nutrition_text.draw(ctx, param.clone().dest(nutrition_dest))?;
 
         let nutrition_rec: Rect =
             Drawable::dimensions(&self.nutrition_text, ctx).unwrap();
-        let oxygen_dest = nalgebra::Point2::new(
+        let oxygen_dest = Point2::new(
             param.dest.x,
             health_rec.bottom() + nutrition_rec.bottom() + 10.0);
 
