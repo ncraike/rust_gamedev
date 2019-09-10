@@ -1,6 +1,6 @@
 use ggez::{Context, GameResult};
 use ggez::graphics::{
-    clear, draw, present, BlendMode, Drawable, DrawParam, Rect, Text, TextFragment};
+    clear, draw, present, BlendMode, Color, Drawable, DrawMode, DrawParam, FillOptions, Mesh, Rect, Text, TextFragment};
 use ggez::input::keyboard;
 use ggez::nalgebra as na;
 
@@ -14,6 +14,7 @@ pub struct UI {
     action_prompt: Text,
     pending_action: Option<UserAction>,
     should_quit: bool,
+    player_pos: Point2,
 }
 
 impl UI {
@@ -24,8 +25,10 @@ impl UI {
                 "Press E to eat food\nPress W to wait\nPress Q to quit"),
             pending_action: None,
             should_quit: false,
+            player_pos: Point2::origin(),
         };
         ui.status_text.update_status(&world.player);
+        ui.player_pos = world.player.pos.clone();
         Ok(ui)
     }
 
@@ -57,6 +60,15 @@ impl UI {
             &self.action_prompt,
             DrawParam::default().dest(Point2::new(0.0, 80.0)),
         )?;
+        let circle = Mesh::new_circle(
+            ctx,
+            DrawMode::Fill(FillOptions::default()),
+            self.player_pos,
+            20.0,
+            0.1,
+            Color::new(1.0, 1.0, 1.0, 1.0),
+        )?;
+        draw(ctx, &circle, DrawParam::default().dest(Point2::new(350.0, 200.0)))?;
         present(ctx)?;
         Ok(())
     }
