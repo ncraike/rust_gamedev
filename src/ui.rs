@@ -40,6 +40,7 @@ impl UI {
                 self.pending_action = None;
                 world.tick();
                 self.status_text.update_status(&world.player);
+                self.player_pos = world.player.pos.clone();
             }
             Some(UserAction::QuitGame) => {
                 self.should_quit = true;
