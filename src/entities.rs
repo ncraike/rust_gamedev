@@ -2,6 +2,7 @@
 use ggez::nalgebra as na;
 
 type Point2 = na::Point2<f32>;
+type Vector2 = na::Vector2<f32>;
 
 pub struct GameWorld {
     pub player: Character,
@@ -54,6 +55,7 @@ impl Character {
     pub fn do_action(&mut self, action: CharacterAction) {
         match action {
             CharacterAction::Eat => self.nutrition += 10,
+            CharacterAction::Move(vector) => self.pos += vector,
             CharacterAction::Wait => (),
         }
     }
@@ -73,4 +75,5 @@ impl Character {
 pub enum CharacterAction {
     Eat,
     Wait,
+    Move(Vector2),
 }

@@ -5,6 +5,7 @@ use ggez::input::keyboard;
 use ggez::nalgebra as na;
 
 type Point2 = na::Point2<f32>;
+type Vector2 = na::Vector2<f32>;
 
 use crate::entities::{Character, CharacterAction, GameWorld};
 
@@ -63,12 +64,13 @@ impl UI {
         let circle = Mesh::new_circle(
             ctx,
             DrawMode::Fill(FillOptions::default()),
-            self.player_pos,
+            Point2::origin(),
             20.0,
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
-        draw(ctx, &circle, DrawParam::default().dest(Point2::new(350.0, 200.0)))?;
+        draw(ctx, &circle, DrawParam::default().dest(
+            self.player_pos + Vector2::new(350.0, 200.0)))?;
         present(ctx)?;
         Ok(())
     }
@@ -88,6 +90,22 @@ impl UI {
             }
             keyboard::KeyCode::Q | keyboard::KeyCode::Escape => {
                 self.pending_action = Some(UserAction::QuitGame);
+            }
+            keyboard::KeyCode::H => {
+                self.pending_action = Some(UserAction::PlayerDo(
+                    CharacterAction::Move(Vector2::new(-10.0, 0.0))));
+            }
+            keyboard::KeyCode::J => {
+                self.pending_action = Some(UserAction::PlayerDo(
+                    CharacterAction::Move(Vector2::new(0.0, 10.0))));
+            }
+            keyboard::KeyCode::K => {
+                self.pending_action = Some(UserAction::PlayerDo(
+                    CharacterAction::Move(Vector2::new(0.0, -10.0))));
+            }
+            keyboard::KeyCode::L => {
+                self.pending_action = Some(UserAction::PlayerDo(
+                    CharacterAction::Move(Vector2::new(10.0, 0.0))));
             }
             _ => (),
         };
